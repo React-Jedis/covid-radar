@@ -5,6 +5,9 @@ import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
 
+/*https://covid19.isciii.es/resources/data.csv
+https://covid19.isciii.es/resources/ccaa.csv*/
+
 const IndexPage = () => (
   <Layout>
     <SEO title="Home" />
