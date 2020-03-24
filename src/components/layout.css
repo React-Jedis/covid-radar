@@ -1,5 +1,5 @@
 html {
-  font-family: sans-serif;
+  font-family: 'Roboto', sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
@@ -242,9 +242,9 @@ html {
 }
 
 body {
-  background-color: #1D1B1B;
-  color: #EC4D37;
-  font-family: georgia, serif;
+  background-color: #191c22;
+  color: #E53A40;
+  font-family: 'Roboto', serif;
   font-weight: normal;
   word-wrap: break-word;
   font-kerning: normal;
