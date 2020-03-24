@@ -11,12 +11,21 @@ const Style = styled.header`
   }
   padding: 0.5rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+
+  h1 > span:last-of-type {
+    margin-left: 8px;
+  }
 `
 
 const Header = () => {
   return (
     <Style>
-      <h1>☣Covid Radar</h1>
+      <h1>
+        <span>☣</span>
+        <span>Covid Radar</span>
+      </h1>
     </Style>
   )
 }
