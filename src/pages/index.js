@@ -5,6 +5,7 @@ import axios from "axios"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
+import Spinner from "../components/Spinner"
 
 /*https://covid19.isciii.es/resources/data.csv
 https://covid19.isciii.es/resources/ccaa.csv*/
@@ -18,6 +19,7 @@ const IndexPage = () => {
   const [defunciones, setDefunciones] = useState(0)
   const [projectedCasos, setProjectedCasos] = useState(casos)
   const [firstMount, setFirstMount] = useState(true)
+  const [loading, setLoading] = useState(true)
   moment.locale("es")
 
   const getInfectedData = () =>
@@ -32,9 +34,10 @@ const IndexPage = () => {
           setCasos(data.Casos)
           setRecuperados(data.Recuperados)
           setDefunciones(data.Defunciones)
+          setLoading(false)
         }
       })
-      .catch(response => console.error("Response erro", response))
+      .catch(response => console.error("Response error", response))
 
   useEffect(() => {
     getInfectedData()
@@ -74,16 +77,20 @@ const IndexPage = () => {
   return (
     <Layout>
       <SEO title="Home" />
-      <DataCard
-        projectedCasos={projectedCasos}
-        recuperados={recuperados}
-        defunciones={defunciones}
-        state="Spain"
-        casos={casos}
-        fecha={fecha}
-        hora={hora}
-        pace={getPace()}
-      ></DataCard>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <DataCard
+          projectedCasos={projectedCasos}
+          recuperados={recuperados}
+          defunciones={defunciones}
+          state="Spain"
+          casos={casos}
+          fecha={fecha}
+          hora={hora}
+          pace={getPace()}
+        />
+      )}
     </Layout>
   )
 }

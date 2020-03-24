@@ -16,6 +16,7 @@ const Card = styled.div`
       ;
     grid-gap: 0.5rem;
     padding: 0.5rem 0.5rem 0 0.5rem;
+    margin-bottom: 8px;
     h3, h1 {
       margin: 0;
     }
@@ -23,11 +24,10 @@ const Card = styled.div`
       font-size: 12px;
     }
     > div {
-      justify-self: stretch;
-      align-self: center;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
     .recuperados {
       color: ${props => props.theme.palette.baseColors.recovered};
@@ -37,7 +37,7 @@ const Card = styled.div`
       margin: 10px
     }
     .pace {
-      border-radius: 2px;
+      border-radius: 4px;
       border: 1px solid grey;
       background-color: ${props => props.theme.palette.baseColors.color};
       color: ${props => props.theme.palette.baseColors.background};
