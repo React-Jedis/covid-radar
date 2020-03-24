@@ -80,44 +80,38 @@ const DataCard = ({
   defunciones,
   state,
   fecha,
-}) => {
-  console.log("recuperados", recuperados.toLocaleString())
-  return (
-    <Card>
-      <span className="legend">
-        *Última actualización del{" "}
-        <a
-          className="isciilink"
-          href="https://covid19.isciii.es"
-          target="_blank"
-        >
-          isciii
-        </a>{" "}
-        {fecha}
-      </span>
-      <div className="title">
-        <h1>{state}</h1>
-      </div>
-      <div className="casos">
-        <h3>{casos.toLocaleString()}*</h3>
-        <span>Casos</span>
-      </div>
-      <div className="projected">
-        <h3 style={{ fontSize: "30px" }}>
-          {parseInt(projectedCasos).toLocaleString()}
-        </h3>
-        <span>Estimación hora actual</span>
-      </div>
-      <div className="recuperados">
-        <h3>{recuperados.toLocaleString()}</h3>
-        <span>Recuperados</span>
-      </div>
-      <div className="defunciones">
-        <h3>{defunciones.toLocaleString()}</h3>
-        <span>Defunciones</span>
-      </div>
-    </Card>
-  )
-}
+  hora,
+}) => (
+  <Card>
+    <span className="legend">
+      *Última actualización del{" "}
+      <a className="isciilink" href="https://covid19.isciii.es" target="_blank">
+        isciii
+      </a>{" "}
+      {fecha} a las {hora}
+    </span>
+    <div className="title">
+      <h1>{state}</h1>
+    </div>
+    <div className="casos">
+      <h3>{casos.toLocaleString()}*</h3>
+      <span>Casos</span>
+    </div>
+    <div className="projected">
+      <h3 style={{ fontSize: "30px" }}>
+        {parseInt(projectedCasos).toLocaleString()}
+      </h3>
+      <span>Estimación de casos hora actual</span>
+    </div>
+    <div className="recuperados">
+      <h3>{recuperados.toLocaleString()}</h3>
+      <span>Recuperados</span>
+    </div>
+    <div className="defunciones">
+      <h3>{defunciones.toLocaleString()}</h3>
+      <span>Defunciones</span>
+    </div>
+  </Card>
+)
 
 export default DataCard
