@@ -54,6 +54,8 @@ const IndexPage = () => {
     setProjectedCasos(casos + (casos24h / (24 * 60 * 60)) * offset.asSeconds())
   }
 
+  const getPace = () => casos24h / (24 * 60)
+
   useEffect(() => {
     let theTimeout
     if (casos !== 0) {
@@ -80,6 +82,7 @@ const IndexPage = () => {
         casos={casos}
         fecha={fecha}
         hora={hora}
+        pace={getPace()}
       ></DataCard>
     </Layout>
   )
