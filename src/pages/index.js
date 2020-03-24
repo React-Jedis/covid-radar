@@ -11,6 +11,7 @@ https://covid19.isciii.es/resources/ccaa.csv*/
 
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
+  const [hora, setHora] = useState("")
   const [casos24h, setCasos24h] = useState(0)
   const [casos, setCasos] = useState(0)
   const [recuperados, setRecuperados] = useState(0)
@@ -24,10 +25,10 @@ const IndexPage = () => {
       .get("https://covid-radar.firebaseio.com/stats.json")
       .then(response => response.data)
       .then(async data => {
-        console.log("llamando al back")
         if (data) {
           setCasos24h(data.Casos24h)
           setFecha(data.Fecha)
+          setHora(data.Hora)
           setCasos(data.Casos)
           setRecuperados(data.Recuperados)
           setDefunciones(data.Defunciones)
@@ -43,6 +44,10 @@ const IndexPage = () => {
 
   const calculateProjectedCasos = () => {
     const theDate = moment(fecha, "LL")
+    const splitedHour = hora.split(":")
+    theDate.add(splitedHour[0], "hours")
+    theDate.add(splitedHour[1], "minutes")
+
     const offset = theDate.isValid()
       ? moment.duration(moment().diff(theDate))
       : moment.duration(1000)
@@ -74,6 +79,7 @@ const IndexPage = () => {
         state="Spain"
         casos={casos}
         fecha={fecha}
+        hora={hora}
       ></DataCard>
     </Layout>
   )
