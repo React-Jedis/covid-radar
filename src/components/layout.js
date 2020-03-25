@@ -7,8 +7,6 @@
 
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import axios from "axios"
-import moment from "moment"
 import { theme } from "../config/theme"
 import { ThemeProvider } from "styled-components"
 import Header from "./header"
