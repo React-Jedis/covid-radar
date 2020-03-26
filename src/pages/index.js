@@ -6,15 +6,16 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
+import PaceChartCard from "../components/PaceChartCard"
 
 /*https://covid19.isciii.es/resources/data.csv
 https://covid19.isciii.es/resources/ccaa.csv*/
 
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
-  const [hora, setHora] = useState("")
   const [casos24h, setCasos24h] = useState(0)
   const [casos, setCasos] = useState(0)
+  const [paceData, setPaceData] = useState([])
   const [recuperados, setRecuperados] = useState(0)
   const [defunciones, setDefunciones] = useState(0)
   const [projectedCasos, setProjectedCasos] = useState(casos)
@@ -24,16 +25,18 @@ const IndexPage = () => {
 
   const getInfectedData = () =>
     axios
-      .get("https://covid-radar.firebaseio.com/stats.json")
+      .get(
+        "https://europe-west2-covid-radar.cloudfunctions.net/getInfectedData?action=stats&country=spain"
+      )
       .then(response => response.data)
       .then(async data => {
         if (data) {
-          setCasos24h(data.Casos24h)
-          setFecha(data.Fecha)
-          setHora(data.Hora)
-          setCasos(data.Casos)
-          setRecuperados(data.Recuperados)
-          setDefunciones(data.Defunciones)
+          setCasos24h(data.casos24h)
+          setFecha(data.fecha)
+          setCasos(data.casos)
+          setRecuperados(data.recuperados)
+          setDefunciones(data.fallecidos)
+          setPaceData(data.pace)
           setLoading(false)
         }
       })
@@ -46,18 +49,14 @@ const IndexPage = () => {
   }, [])
 
   const calculateProjectedCasos = () => {
-    const theDate = moment(fecha, "LL")
-    const splitedHour = hora.split(":")
-    theDate.add(splitedHour[0], "hours")
-    theDate.add(splitedHour[1], "minutes")
-
+    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
     const offset = theDate.isValid()
       ? moment.duration(moment().diff(theDate))
       : moment.duration(1000)
     setProjectedCasos(casos + (casos24h / (24 * 60 * 60)) * offset.asSeconds())
   }
 
-  const getPace = () => casos24h / (24 * 60)
+  const getPace = () => paceData[paceData.length - 1].value
 
   useEffect(() => {
     let theTimeout
@@ -80,16 +79,18 @@ const IndexPage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <DataCard
-          projectedCasos={projectedCasos}
-          recuperados={recuperados}
-          defunciones={defunciones}
-          state="Spain"
-          casos={casos}
-          fecha={fecha}
-          hora={hora}
-          pace={getPace()}
-        />
+        <>
+          <DataCard
+            projectedCasos={projectedCasos}
+            recuperados={recuperados}
+            defunciones={defunciones}
+            state="Spain"
+            casos={casos}
+            fecha={fecha}
+            pace={getPace()}
+          />
+          <PaceChartCard paceData={paceData} />
+        </>
       )}
     </Layout>
   )
