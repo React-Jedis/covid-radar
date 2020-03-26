@@ -1,14 +1,26 @@
 import React from "react"
 import { Chart } from "react-charts"
 
-const PaceChart = ({ paceData }) => {
+const PaceChart = ({ paceData, porcentualIncrementPace }) => {
   const data = React.useMemo(
     () => [
       {
         label: "Casos por minuto",
         data: paceData,
       },
+      {
+        label: "Incremento porcentual",
+        data: porcentualIncrementPace,
+        type: "bar",
+      },
     ],
+    []
+  )
+
+  const series = React.useCallback(
+    (s, i) => ({
+      type: i % 2 === 0 ? "line" : "bar",
+    }),
     []
   )
 
@@ -27,7 +39,7 @@ const PaceChart = ({ paceData }) => {
         height: "200px",
       }}
     >
-      <Chart data={data} axes={axes} tooltip dark />
+      <Chart data={data} axes={axes} series={series} tooltip dark />
     </div>
   )
 }
