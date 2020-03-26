@@ -1,18 +1,12 @@
 import React from "react"
 import { Chart } from "react-charts"
-import moment from "moment"
 
 const PaceChart = ({ paceData }) => {
   const data = React.useMemo(
     () => [
       {
-        label: "Casos por Minuto",
-        data: [
-          { x: moment(), y: 3.14 },
-          { x: moment().add(1, "days"), y: 4.57 },
-          { x: moment().add(2, "days"), y: 5.51 },
-          { x: moment().add(3, "days"), y: 5.95 },
-        ],
+        label: "Casos por minuto",
+        data: paceData,
       },
     ],
     []
@@ -33,7 +27,7 @@ const PaceChart = ({ paceData }) => {
         height: "200px",
       }}
     >
-      <Chart data={data} axes={axes} />
+      <Chart data={data} axes={axes} tooltip dark />
     </div>
   )
 }

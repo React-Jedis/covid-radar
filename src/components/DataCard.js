@@ -42,7 +42,7 @@ const InfoData = styled.div`
       color: ${props => props.theme.palette.baseColors.cases};
     }
     .title {
-      color: #cacaca;
+      color: ${props => props.theme.palette.baseColors.cardTitle};
     }
     .legend {
       font-size: 8px;
