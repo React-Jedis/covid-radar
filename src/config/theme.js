@@ -7,6 +7,7 @@ module.exports = {
         projected: "#30A9DE",
         recovered: "#009688",
         cases: "#fdc007",
+        cardTitle: "#cacaca",
       },
     },
   },

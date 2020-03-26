@@ -1,11 +1,8 @@
 import React from "react"
 import styled from "styled-components"
+import Card from "../components/Card/Card"
 
-const Card = styled.div`
-    border: 1px solid grey;
-    background-color:  rgba(255,255,255,.05);;
-    border-radius: 4px;
-    color: ${props => props.theme.palette.baseColors.color};
+const InfoData = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
@@ -15,8 +12,6 @@ const Card = styled.div`
       "legend legend legend"
       ;
     grid-gap: 0.5rem;
-    padding: 0.5rem 0.5rem 0 0.5rem;
-    margin-bottom: 8px;
     h3, h1 {
       margin: 0;
     }
@@ -47,7 +42,7 @@ const Card = styled.div`
       color: ${props => props.theme.palette.baseColors.cases};
     }
     .title {
-      color: #cacaca;
+      color: ${props => props.theme.palette.baseColors.cardTitle};
     }
     .legend {
       font-size: 8px;
@@ -95,38 +90,44 @@ const DataCard = ({
   pace,
 }) => (
   <Card>
-    <span className="legend">
-      *Última actualización del{" "}
-      <a className="isciilink" href="https://covid19.isciii.es" target="_blank">
-        isciii
-      </a>{" "}
-      {fecha} a las {hora}
-    </span>
-    <div className="title">
-      <h1>{state}</h1>
-    </div>
-    <div className="pace">
-      <h3>{pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-      <span>Casos/minuto</span>
-    </div>
-    <div className="casos">
-      <h3>{casos.toLocaleString()}*</h3>
-      <span>Casos</span>
-    </div>
-    <div className="projected">
-      <h3 style={{ fontSize: "35px" }}>
-        {parseInt(projectedCasos).toLocaleString()}
-      </h3>
-      <span>Estimación de casos hora actual</span>
-    </div>
-    <div className="recuperados">
-      <h3>{recuperados.toLocaleString()}</h3>
-      <span>Recuperados</span>
-    </div>
-    <div className="defunciones">
-      <h3>{defunciones.toLocaleString()}</h3>
-      <span>Defunciones</span>
-    </div>
+    <InfoData>
+      <span className="legend">
+        *Última actualización del{" "}
+        <a
+          className="isciilink"
+          href="https://covid19.isciii.es"
+          target="_blank"
+        >
+          isciii
+        </a>{" "}
+        {fecha}
+      </span>
+      <div className="title">
+        <h1>{state}</h1>
+      </div>
+      <div className="pace">
+        <h3>{pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+        <span>Casos/minuto</span>
+      </div>
+      <div className="casos">
+        <h3>{casos.toLocaleString()}*</h3>
+        <span>Casos</span>
+      </div>
+      <div className="projected">
+        <h3 style={{ fontSize: "35px" }}>
+          {parseInt(projectedCasos).toLocaleString()}
+        </h3>
+        <span>Estimación de casos hora actual</span>
+      </div>
+      <div className="recuperados">
+        <h3>{recuperados.toLocaleString()}</h3>
+        <span>Recuperados</span>
+      </div>
+      <div className="defunciones">
+        <h3>{defunciones.toLocaleString()}</h3>
+        <span>Defunciones</span>
+      </div>
+    </InfoData>
   </Card>
 )
 
