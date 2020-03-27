@@ -5,6 +5,7 @@ import styled from "styled-components"
 const PredictionData = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 10px;
   color: ${props => props.theme.palette.baseColors.cardTitle};
   .text {
