@@ -8,22 +8,9 @@ const PaceChart = ({ paceData, porcentualIncrementPace }) => {
         label: "Casos por minuto",
         data: paceData,
       },
-      {
-        label: "Incremento porcentual",
-        data: porcentualIncrementPace,
-        type: "bar",
-      },
     ],
     []
   )
-
-  const series = React.useCallback(
-    (s, i) => ({
-      type: i % 2 === 0 ? "line" : "bar",
-    }),
-    []
-  )
-
   const axes = React.useMemo(
     () => [
       { primary: true, type: "time", position: "bottom" },
@@ -39,7 +26,7 @@ const PaceChart = ({ paceData, porcentualIncrementPace }) => {
         height: "200px",
       }}
     >
-      <Chart data={data} axes={axes} series={series} tooltip dark />
+      <Chart data={data} axes={axes} tooltip dark />
     </div>
   )
 }

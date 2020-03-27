@@ -13,23 +13,12 @@ const formatToChartPaceData = theData =>
     return { x: moment(pace.fecha, "DD-MM-YYYY HH:mm:ss"), y: pace.value }
   })
 
-const formatToChartIncrementPaceData = theData =>
-  theData.map(pace => {
-    return {
-      x: moment(pace.fecha, "DD-MM-YYYY HH:mm:ss"),
-      y: pace.porcentualIncrement * 100,
-    }
-  })
-
 const PaceChartCard = ({ paceData }) => (
   <Card>
     <Title>
       <h3>Evolución casos por minuto</h3>
     </Title>
-    <PaceChart
-      paceData={formatToChartPaceData(paceData)}
-      porcentualIncrementPace={formatToChartIncrementPaceData(paceData)}
-    />
+    <PaceChart paceData={formatToChartPaceData(paceData)} />
   </Card>
 )
 
