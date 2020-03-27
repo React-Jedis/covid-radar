@@ -1,14 +1,16 @@
 import PropTypes from "prop-types"
 import React from "react"
 import styled from "styled-components"
-import virus from "../images/virus.png"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faVirus } from "@fortawesome/free-solid-svg-icons"
 import "moment/locale/es"
 
 const Style = styled.header`
   background: ${props => props.theme.palette.baseColors.color};
-  color: ${props => props.theme.palette.baseColors.background};
+  color: white;
   h1 {
     margin: 0;
+    font-weight: 100;
     img {
       margin: 0;
     }
@@ -27,8 +29,8 @@ const Header = () => {
   return (
     <Style>
       <h1>
-        <img src={virus} height="30px" />
-        <span>Covid Radar</span>
+        <FontAwesomeIcon icon={faVirus} />
+        <span>covid-radar</span>
       </h1>
     </Style>
   )

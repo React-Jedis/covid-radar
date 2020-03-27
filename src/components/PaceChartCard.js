@@ -5,6 +5,7 @@ import PaceChart from "./PaceChart/PaceChart"
 import styled from "styled-components"
 
 const Title = styled.div`
+  padding: 10px;
   color: ${props => props.theme.palette.baseColors.cardTitle};
 `
 

@@ -2,11 +2,12 @@ module.exports = {
   theme: {
     palette: {
       baseColors: {
-        color: "#E53A40",
+        color: "#40c6a2",
         background: "#191c22",
-        projected: "#30A9DE",
-        recovered: "#009688",
-        cases: "#fdc007",
+        projected: "#c1345f",
+        recovered: "#40c6a2",
+        cases: "#ff8800",
+        deaths: "#111111",
         cardTitle: "#cacaca",
       },
     },

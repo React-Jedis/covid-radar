@@ -1,15 +1,41 @@
 import React, { useState, useEffect } from "react"
 import moment from "moment"
 import axios from "axios"
+import styled from "styled-components"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
 import PaceChartCard from "../components/PaceChartCard"
+import Card from "../components/Card/Card"
+import PrediccionCard from "../components/PrediccionCard"
 
 /*https://covid19.isciii.es/resources/data.csv
 https://covid19.isciii.es/resources/ccaa.csv*/
+
+const Legend = styled.span`
+  padding: 3px;
+  text-align: center;
+  display: block;
+  font-size: 12px;
+  color: grey;
+  .isciilink {
+    color: ${props => props.theme.palette.baseColors.projected};
+    text-decoration: none;
+  }
+`
+
+const Wrapper = styled.div`
+  > * {
+    margin-bottom: 10px;
+  }
+
+  > *:first-of-type,
+  > *:last-of-type {
+    margin: 0;
+  }
+`
 
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
@@ -48,12 +74,42 @@ const IndexPage = () => {
     return () => clearInterval(interval)
   }, [])
 
-  const calculateProjectedCasos = () => {
-    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
+  const calculateProjectedCasos = (
+    theDate,
+    currentDate,
+    theCasos,
+    theCasos24h
+  ) => {
     const offset = theDate.isValid()
-      ? moment.duration(moment().diff(theDate))
+      ? moment.duration(currentDate.diff(theDate))
       : moment.duration(1000)
-    setProjectedCasos(casos + (casos24h / (24 * 60 * 60)) * offset.asSeconds())
+
+    const projectedCasos =
+      theCasos + (theCasos24h / (24 * 60 * 60)) * offset.asSeconds()
+    return projectedCasos
+  }
+
+  const calculatePrediction = (fecha, casos, casos24h) => {
+    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
+    const calculate = moment(theDate.toDate()).add(1, "d")
+    const projectedCasos = calculateProjectedCasos(
+      theDate,
+      calculate,
+      casos,
+      casos24h
+    )
+    return projectedCasos
+  }
+
+  const updateStateWithPojectedCasos = () => {
+    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
+    const projectedCasos = calculateProjectedCasos(
+      theDate,
+      moment(),
+      casos,
+      casos24h
+    )
+    setProjectedCasos(projectedCasos)
   }
 
   const getPace = () => paceData[paceData.length - 1].value
@@ -62,10 +118,10 @@ const IndexPage = () => {
     let theTimeout
     if (casos !== 0) {
       if (firstMount) {
-        calculateProjectedCasos()
+        updateStateWithPojectedCasos()
         setFirstMount(false)
       } else {
-        theTimeout = setTimeout(calculateProjectedCasos, 5000)
+        theTimeout = setTimeout(updateStateWithPojectedCasos, 5000)
       }
     }
     return () => {
@@ -79,18 +135,32 @@ const IndexPage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <>
+        <Wrapper>
           <DataCard
             projectedCasos={projectedCasos}
             recuperados={recuperados}
             defunciones={defunciones}
-            state="Spain"
+            state="España"
             casos={casos}
             fecha={fecha}
             pace={getPace()}
           />
+          <Legend>
+            *Última actualización del{" "}
+            <a
+              className="isciilink"
+              href="https://covid19.isciii.es"
+              target="_blank"
+            >
+              isciii
+            </a>{" "}
+            {fecha}
+          </Legend>
+          <PrediccionCard
+            prediccion={calculatePrediction(fecha, casos, casos24h)}
+          />
           <PaceChartCard paceData={paceData} />
-        </>
+        </Wrapper>
       )}
     </Layout>
   )
