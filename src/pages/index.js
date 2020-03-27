@@ -15,11 +15,25 @@ import PrediccionCard from "../components/PrediccionCard"
 https://covid19.isciii.es/resources/ccaa.csv*/
 
 const Legend = styled.span`
+  padding: 3px;
+  text-align: center;
+  display: block;
   font-size: 12px;
   color: grey;
   .isciilink {
     color: ${props => props.theme.palette.baseColors.projected};
     text-decoration: none;
+  }
+`
+
+const Wrapper = styled.div`
+  > * {
+    margin-bottom: 10px;
+  }
+
+  > *:first-of-type,
+  > *:last-of-type {
+    margin: 0;
   }
 `
 
@@ -121,7 +135,7 @@ const IndexPage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <>
+        <Wrapper>
           <DataCard
             projectedCasos={projectedCasos}
             recuperados={recuperados}
@@ -146,7 +160,7 @@ const IndexPage = () => {
             prediccion={calculatePrediction(fecha, casos, casos24h)}
           />
           <PaceChartCard paceData={paceData} />
-        </>
+        </Wrapper>
       )}
     </Layout>
   )

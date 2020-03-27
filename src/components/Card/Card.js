@@ -6,7 +6,6 @@ const Style = styled.div`
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   color: ${props => props.theme.palette.baseColors.color};
-  margin: 5px 0;
 `
 
 const Card = ({ children }) => <Style>{children}</Style>

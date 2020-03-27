@@ -24,6 +24,7 @@ const PaceChart = ({ paceData, porcentualIncrementPace }) => {
       style={{
         width: "100%",
         height: "200px",
+        padding: "10px",
       }}
     >
       <Chart data={data} axes={axes} tooltip dark />

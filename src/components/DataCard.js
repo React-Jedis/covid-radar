@@ -19,6 +19,7 @@ const InfoData = styled.div`
     }
     span.data {
       font-size: 20px;
+      font-weight: bold;
     }
     > div {
       display: flex;
@@ -37,18 +38,21 @@ const InfoData = styled.div`
     }
     .pace {
       border-radius: 50%;
+      min-width: 85px;
+      max-width: 85px;
       margin: 10px;
       background-color:  ${props => props.theme.palette.baseColors.projected};
       color: white;
-      
     }
     .casos {
       background-color: ${props => props.theme.palette.baseColors.cases};
       color: white;
+      border-radius: 0 0 0 8px;
     }
     .defunciones {
       background-color: ${props => props.theme.palette.baseColors.deaths};
       color: white;
+      border-radius: 0 0 8px 0;
     }
     .title {
       color: white;
@@ -70,6 +74,7 @@ const InfoData = styled.div`
   }
   .pace {
     grid-area: pace;
+    justify-self: center;
   }
   .projected {
     grid-area: projected;

@@ -5,14 +5,14 @@ const StyledSpinner = styled.div`
   &,
   &:before,
   &:after {
-    background: #e53a40;
+    background: #40c6a2;
     -webkit-animation: load1 1s infinite ease-in-out;
     animation: load1 1s infinite ease-in-out;
     width: 1em;
     height: 4em;
   }
   & {
-    color: #e53a40;
+    color: #40c6a2;
     text-indent: -9999em;
     margin: 88px auto;
     position: relative;
