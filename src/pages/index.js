@@ -1,20 +1,43 @@
 import React, { useState, useEffect } from "react"
 import moment from "moment"
 import axios from "axios"
+import styled from "styled-components"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
+import PaceChartCard from "../components/PaceChartCard"
+import PrediccionCard from "../components/PrediccionCard"
 
-/*https://covid19.isciii.es/resources/data.csv
-https://covid19.isciii.es/resources/ccaa.csv*/
+const Legend = styled.span`
+  padding: 3px;
+  text-align: center;
+  display: block;
+  font-size: 12px;
+  color: grey;
+  .isciilink {
+    color: ${props => props.theme.palette.baseColors.projected};
+    text-decoration: none;
+  }
+`
+
+const Wrapper = styled.div`
+  > * {
+    margin-bottom: 10px;
+  }
+
+  > *:first-of-type,
+  > *:last-of-type {
+    margin: 0;
+  }
+`
 
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
-  const [hora, setHora] = useState("")
   const [casos24h, setCasos24h] = useState(0)
   const [casos, setCasos] = useState(0)
+  const [paceData, setPaceData] = useState([])
   const [recuperados, setRecuperados] = useState(0)
   const [defunciones, setDefunciones] = useState(0)
   const [projectedCasos, setProjectedCasos] = useState(casos)
@@ -24,16 +47,18 @@ const IndexPage = () => {
 
   const getInfectedData = () =>
     axios
-      .get("https://covid-radar.firebaseio.com/stats.json")
+      .get(
+        "https://europe-west2-covid-radar.cloudfunctions.net/getInfectedData?action=stats&country=spain"
+      )
       .then(response => response.data)
       .then(async data => {
         if (data) {
-          setCasos24h(data.Casos24h)
-          setFecha(data.Fecha)
-          setHora(data.Hora)
-          setCasos(data.Casos)
-          setRecuperados(data.Recuperados)
-          setDefunciones(data.Defunciones)
+          setCasos24h(data.casos24h)
+          setFecha(data.fecha)
+          setCasos(data.casos)
+          setRecuperados(data.recuperados)
+          setDefunciones(data.fallecidos)
+          setPaceData(data.pace)
           setLoading(false)
         }
       })
@@ -45,28 +70,54 @@ const IndexPage = () => {
     return () => clearInterval(interval)
   }, [])
 
-  const calculateProjectedCasos = () => {
-    const theDate = moment(fecha, "LL")
-    const splitedHour = hora.split(":")
-    theDate.add(splitedHour[0], "hours")
-    theDate.add(splitedHour[1], "minutes")
-
+  const calculateProjectedCasos = (
+    theDate,
+    currentDate,
+    theCasos,
+    theCasos24h
+  ) => {
     const offset = theDate.isValid()
-      ? moment.duration(moment().diff(theDate))
+      ? moment.duration(currentDate.diff(theDate))
       : moment.duration(1000)
-    setProjectedCasos(casos + (casos24h / (24 * 60 * 60)) * offset.asSeconds())
+
+    const projectedCasos =
+      theCasos + (theCasos24h / (24 * 60 * 60)) * offset.asSeconds()
+    return projectedCasos
   }
 
-  const getPace = () => casos24h / (24 * 60)
+  const calculatePrediction = (fecha, casos, casos24h) => {
+    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
+    const calculate = moment(theDate.toDate()).add(1, "d")
+    const projectedCasos = calculateProjectedCasos(
+      theDate,
+      calculate,
+      casos,
+      casos24h
+    )
+    return projectedCasos
+  }
+
+  const updateStateWithPojectedCasos = () => {
+    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
+    const projectedCasos = calculateProjectedCasos(
+      theDate,
+      moment(),
+      casos,
+      casos24h
+    )
+    setProjectedCasos(projectedCasos)
+  }
+
+  const getPace = () => paceData[paceData.length - 1].value
 
   useEffect(() => {
     let theTimeout
     if (casos !== 0) {
       if (firstMount) {
-        calculateProjectedCasos()
+        updateStateWithPojectedCasos()
         setFirstMount(false)
       } else {
-        theTimeout = setTimeout(calculateProjectedCasos, 5000)
+        theTimeout = setTimeout(updateStateWithPojectedCasos, 5000)
       }
     }
     return () => {
@@ -80,16 +131,32 @@ const IndexPage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <DataCard
-          projectedCasos={projectedCasos}
-          recuperados={recuperados}
-          defunciones={defunciones}
-          state="Spain"
-          casos={casos}
-          fecha={fecha}
-          hora={hora}
-          pace={getPace()}
-        />
+        <Wrapper>
+          <DataCard
+            projectedCasos={projectedCasos}
+            recuperados={recuperados}
+            defunciones={defunciones}
+            state="España"
+            casos={casos}
+            fecha={fecha}
+            pace={getPace()}
+          />
+          <Legend>
+            *Última actualización del{" "}
+            <a
+              className="isciilink"
+              href="https://covid19.isciii.es"
+              target="_blank"
+            >
+              isciii
+            </a>{" "}
+            {fecha}
+          </Legend>
+          <PrediccionCard
+            prediccion={calculatePrediction(fecha, casos, casos24h)}
+          />
+          <PaceChartCard paceData={paceData} />
+        </Wrapper>
       )}
     </Layout>
   )
