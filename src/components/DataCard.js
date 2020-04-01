@@ -1,64 +1,69 @@
 import React from "react"
 import styled from "styled-components"
+import moment from "moment"
+import Card from "../components/Card/Card"
 
-const Card = styled.div`
-    border: 1px solid grey;
-    background-color:  rgba(255,255,255,.05);;
-    border-radius: 4px;
-    color: ${props => props.theme.palette.baseColors.color};
+const InfoData = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
-      "title title title"
+      "title . date"
       "projected projected pace"
       "casos recuperados defunciones"
-      "legend legend legend"
       ;
-    grid-gap: 0.5rem;
-    padding: 0.5rem 0.5rem 0 0.5rem;
-    margin-bottom: 8px;
     h3, h1 {
       margin: 0;
     }
-    span {
+    span.description {
       font-size: 12px;
+    }
+    span.data {
+      font-size: 20px;
+      font-weight: bold;
     }
     > div {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 1rem 0;
     }
     .recuperados {
-      color: ${props => props.theme.palette.baseColors.recovered};
+      background-color: ${props => props.theme.palette.baseColors.recovered};
+      color: white;
     }
     .projected {
       color: ${props => props.theme.palette.baseColors.projected};
       margin: 10px
     }
     .pace {
-      border-radius: 4px;
-      border: 1px solid grey;
-      background-color: ${props => props.theme.palette.baseColors.color};
-      color: ${props => props.theme.palette.baseColors.background};
-      opacity: 0.8;
+      border-radius: 50%;
+      min-width: 85px;
+      max-width: 85px;
+      margin: 10px;
+      background-color:  ${props => props.theme.palette.baseColors.projected};
+      color: white;
     }
     .casos {
-      color: ${props => props.theme.palette.baseColors.cases};
+      background-color: ${props => props.theme.palette.baseColors.cases};
+      color: white;
+      border-radius: 0 0 0 8px;
+    }
+    .defunciones {
+      background-color: ${props => props.theme.palette.baseColors.deaths};
+      color: white;
+      border-radius: 0 0 8px 0;
     }
     .title {
-      color: #cacaca;
+      color: white;
+      font-size: 25px;
     }
-    .legend {
-      font-size: 8px;
-      color: grey;
-      margin-right: 0.3rem;
-      text-align: right;
-      .isciilink {
-        color: ${props => props.theme.palette.baseColors.projected};
-        text-decoration: none;
-
-      }
+    .date {
+      color: ${props => props.theme.palette.baseColors.cardTitle};
+      font-size: 15px;
+    }
+    .casos-desc {
+      opacity: 0.7
     }
   }
   .title {
@@ -69,6 +74,7 @@ const Card = styled.div`
   }
   .pace {
     grid-area: pace;
+    justify-self: center;
   }
   .projected {
     grid-area: projected;
@@ -81,6 +87,9 @@ const Card = styled.div`
   }
   .legend {
     grid-area: legend;
+  }
+  .date {
+    grid-area: date;
   }
 `
 
@@ -95,38 +104,38 @@ const DataCard = ({
   pace,
 }) => (
   <Card>
-    <span className="legend">
-      *Última actualización del{" "}
-      <a className="isciilink" href="https://covid19.isciii.es" target="_blank">
-        isciii
-      </a>{" "}
-      {fecha} a las {hora}
-    </span>
-    <div className="title">
-      <h1>{state}</h1>
-    </div>
-    <div className="pace">
-      <h3>{pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-      <span>Casos/minuto</span>
-    </div>
-    <div className="casos">
-      <h3>{casos.toLocaleString()}*</h3>
-      <span>Casos</span>
-    </div>
-    <div className="projected">
-      <h3 style={{ fontSize: "35px" }}>
-        {parseInt(projectedCasos).toLocaleString()}
-      </h3>
-      <span>Estimación de casos hora actual</span>
-    </div>
-    <div className="recuperados">
-      <h3>{recuperados.toLocaleString()}</h3>
-      <span>Recuperados</span>
-    </div>
-    <div className="defunciones">
-      <h3>{defunciones.toLocaleString()}</h3>
-      <span>Defunciones</span>
-    </div>
+    <InfoData>
+      <div className="title">
+        <span>{state}</span>
+      </div>
+      <div className="date">
+        <span>{moment().format("DD/MM/YYYY")}</span>
+      </div>
+      <div className="pace">
+        <span className="data">
+          {pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+        </span>
+        <span className="description casos-desc">casos / min.</span>
+      </div>
+      <div className="casos">
+        <span className="data">{casos.toLocaleString()}*</span>
+        <span className="description">casos</span>
+      </div>
+      <div className="projected">
+        <span className="data" style={{ fontSize: "35px" }}>
+          {parseInt(projectedCasos).toLocaleString()}
+        </span>
+        <span className="description">Estimación de casos hora actual</span>
+      </div>
+      <div className="recuperados">
+        <span className="data">{recuperados.toLocaleString()}</span>
+        <span className="description">recuperados</span>
+      </div>
+      <div className="defunciones">
+        <span className="data">{defunciones.toLocaleString()}</span>
+        <span className="description">defunciones</span>
+      </div>
+    </InfoData>
   </Card>
 )
 

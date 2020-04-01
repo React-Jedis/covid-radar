@@ -35,7 +35,7 @@ const Layout = ({ children }) => {
             gridRowEnd: "3",
           }}
         >
-          <span>
+          <span style={{ color: "#40c6a2" }}>
             © {new Date().getFullYear()}, <a>covid-radar.xyz</a>
           </span>
         </footer>
