@@ -1,8 +1,8 @@
 module.exports = {
   siteMetadata: {
-    title: `☣Covid Radar`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    title: `Covid Radar`,
+    description: `Modelo predictivo de casos de infeción por el coronavirus conocido como covid-19.`,
+    author: `@React-Jedis`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -21,6 +21,12 @@ module.exports = {
         },
       },
     },
+    {
+      resolve: "gatsby-plugin-google-analytics",
+      options: {
+        trackingId: process.env.GOOGLE_ANALYTICS_TRAKING_ID || "none",
+      },
+    },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
@@ -32,7 +38,7 @@ module.exports = {
         background_color: `#663399`,
         theme_color: `#663399`,
         display: `minimal-ui`,
-        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+        icon: `src/images/virus.png`, // This path is relative to the root of the site.
       },
     },
     // this (optional) plugin enables Progressive Web App + Offline functionality

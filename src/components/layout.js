@@ -7,8 +7,6 @@
 
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import axios from "axios"
-import moment from "moment"
 import { theme } from "../config/theme"
 import { ThemeProvider } from "styled-components"
 import Header from "./header"
@@ -23,12 +21,23 @@ const Layout = ({ children }) => {
           margin: `0 auto`,
           maxWidth: 960,
           padding: `0 1.0875rem 1.45rem`,
+          display: "grid",
+          gridTemplateRows: "minmax(calc(100vh - 140px), 1fr) auto",
         }}
       >
         <main>{children}</main>
-        <footer>
-          © {new Date().getFullYear()},{` `}
-          <a>Covid-Radar.xyz</a>
+        <footer
+          style={{
+            fontSize: "11px",
+            display: "flex",
+            justifyContent: "flex-end",
+            gridRowStart: "2",
+            gridRowEnd: "3",
+          }}
+        >
+          <span>
+            © {new Date().getFullYear()}, <a>covid-radar.xyz</a>
+          </span>
         </footer>
       </div>
     </ThemeProvider>

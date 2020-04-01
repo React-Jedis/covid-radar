@@ -10,12 +10,13 @@ const Card = styled.div`
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
       "title title title"
-      "projected projected projected"
+      "projected projected pace"
       "casos recuperados defunciones"
       "legend legend legend"
       ;
     grid-gap: 0.5rem;
-    padding-top: 0.5rem;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    margin-bottom: 8px;
     h3, h1 {
       margin: 0;
     }
@@ -23,10 +24,10 @@ const Card = styled.div`
       font-size: 12px;
     }
     > div {
-      justify-self: center;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
     .recuperados {
       color: ${props => props.theme.palette.baseColors.recovered};
@@ -34,6 +35,13 @@ const Card = styled.div`
     .projected {
       color: ${props => props.theme.palette.baseColors.projected};
       margin: 10px
+    }
+    .pace {
+      border-radius: 4px;
+      border: 1px solid grey;
+      background-color: ${props => props.theme.palette.baseColors.color};
+      color: ${props => props.theme.palette.baseColors.background};
+      opacity: 0.8;
     }
     .casos {
       color: ${props => props.theme.palette.baseColors.cases};
@@ -59,6 +67,9 @@ const Card = styled.div`
   .casos {
     grid-area: casos;
   }
+  .pace {
+    grid-area: pace;
+  }
   .projected {
     grid-area: projected;
   }
@@ -81,6 +92,7 @@ const DataCard = ({
   state,
   fecha,
   hora,
+  pace,
 }) => (
   <Card>
     <span className="legend">
@@ -93,12 +105,16 @@ const DataCard = ({
     <div className="title">
       <h1>{state}</h1>
     </div>
+    <div className="pace">
+      <h3>{pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+      <span>Casos/minuto</span>
+    </div>
     <div className="casos">
       <h3>{casos.toLocaleString()}*</h3>
       <span>Casos</span>
     </div>
     <div className="projected">
-      <h3 style={{ fontSize: "30px" }}>
+      <h3 style={{ fontSize: "35px" }}>
         {parseInt(projectedCasos).toLocaleString()}
       </h3>
       <span>Estimación de casos hora actual</span>
