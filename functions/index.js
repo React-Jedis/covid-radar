@@ -163,6 +163,7 @@ const manageDB = async (
     recuperados: Number(recuperados),
     hospitalizados: Number(hospitalizados),
     casos24h: Number(casos24h),
+    casosActivos: Number(casos) - Number(recuperados) - Number(fallecidos)
   }
 
   const lastPace = pace[pace.length - 1]
