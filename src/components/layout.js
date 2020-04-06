@@ -9,7 +9,9 @@ import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { theme } from "../config/theme"
 import { ThemeProvider } from "styled-components"
+
 import Header from "./header"
+import SocialMedia from '../components/SocialMedia'
 import "./layout.css"
 
 const Layout = ({ children }) => {
@@ -26,6 +28,7 @@ const Layout = ({ children }) => {
         }}
       >
         <main>{children}</main>
+        <SocialMedia />
         <footer
           style={{
             fontSize: "11px",

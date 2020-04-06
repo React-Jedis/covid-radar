@@ -8,11 +8,7 @@ import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
 import PaceChartCard from "../components/PaceChartCard"
-import Card from "../components/Card/Card"
 import PrediccionCard from "../components/PrediccionCard"
-
-/*https://covid19.isciii.es/resources/data.csv
-https://covid19.isciii.es/resources/ccaa.csv*/
 
 const Legend = styled.span`
   padding: 3px;
