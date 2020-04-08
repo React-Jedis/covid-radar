@@ -24,20 +24,21 @@ const Layout = ({ children }) => {
           maxWidth: 960,
           padding: `0 1.0875rem 1.45rem`,
           display: "grid",
-          gridTemplateRows: "minmax(calc(100vh - 140px), 1fr) auto",
+          gridTemplateRows: "minmax(calc(100vh - 160px), 1fr) auto",
         }}
       >
         <main>{children}</main>
-        <SocialMedia />
         <footer
           style={{
             fontSize: "11px",
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            alignItems: "center",
             gridRowStart: "2",
             gridRowEnd: "3",
           }}
         >
+          <SocialMedia />
           <span style={{ color: "#40c6a2" }}>
             © {new Date().getFullYear()}, <a>covid-radar.xyz</a>
           </span>
