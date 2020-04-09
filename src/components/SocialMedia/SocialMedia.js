@@ -50,6 +50,10 @@ const SocialMediaIcon = styled.a`
     border-radius: 50%;
   }
 
+  &.fa:last-of-type {
+    margin: 5px 0 5px 2px;
+  }
+
   &.fa:hover {
     opacity: 0.7;
   }
