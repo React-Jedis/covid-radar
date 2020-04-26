@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import moment from "moment"
 import axios from "axios"
 import styled from "styled-components"
 
-import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
 import PaceChartCard from "../components/PaceChartCard"
 import PrediccionCard from "../components/PrediccionCard"
+
+const Layout = React.lazy(() => import("../components/layout"))
 
 const Legend = styled.span`
   padding: 3px;
@@ -36,10 +37,14 @@ const Wrapper = styled.div`
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
   const [casos24h, setCasos24h] = useState(0)
+  const [incrementCasos24h, setIncrementCasos24h] = useState(0)
   const [casos, setCasos] = useState(0)
+  const [incrementCasos, setIncrementCasos] = useState(0)
   const [paceData, setPaceData] = useState([])
   const [recuperados, setRecuperados] = useState(0)
+  const [incrementRecuperados, setIncrementRecuperados] = useState(0)
   const [defunciones, setDefunciones] = useState(0)
+  const [incrementDefunciones, setIncrementDefunciones] = useState(0)
   const [projectedCasos, setProjectedCasos] = useState(casos)
   const [firstMount, setFirstMount] = useState(true)
   const [loading, setLoading] = useState(true)
@@ -59,10 +64,43 @@ const IndexPage = () => {
           setRecuperados(data.recuperados)
           setDefunciones(data.fallecidos)
           setPaceData(data.pace)
+
+          getHistoricalData(
+            data.casos24h,
+            data.casos,
+            data.recuperados,
+            data.fallecidos
+          )
           setLoading(false)
         }
       })
       .catch(response => console.error("Response error", response))
+
+  const getHistoricalData = (
+    currentCasos24h,
+    currentCasos,
+    currentRecuperados,
+    currentFallecidos
+  ) => {
+    axios
+      .get("https://europe-west2-covid-radar.cloudfunctions.net/getHistorical")
+      .then(response => response.data)
+      .then(async data => {
+        if (data && data.serie) {
+          const { casos, casos24h, fallecidos, recuperados } = data.serie[
+            data.serie.length - (data.serie.length > 1 ? 2 : 1)
+          ]
+
+          console.log("[serie]", casos, casos24h, fallecidos, recuperados)
+
+          setIncrementCasos24h(currentCasos24h - casos24h)
+          setIncrementCasos(currentCasos - casos)
+          setIncrementRecuperados(currentRecuperados - recuperados)
+          setIncrementDefunciones(currentFallecidos - fallecidos)
+        }
+      })
+      .catch(error => console.log(error))
+  }
 
   useEffect(() => {
     getInfectedData()
@@ -126,39 +164,44 @@ const IndexPage = () => {
   }, [casos, projectedCasos, firstMount])
 
   return (
-    <Layout>
-      <SEO title="Home" />
-      {loading ? (
-        <Spinner />
-      ) : (
-        <Wrapper>
-          <DataCard
-            projectedCasos={projectedCasos}
-            recuperados={recuperados}
-            defunciones={defunciones}
-            state="España"
-            casos={casos}
-            fecha={fecha}
-            pace={getPace()}
-          />
-          <Legend>
-            *Última actualización del{" "}
-            <a
-              className="isciilink"
-              href="https://covid19.isciii.es"
-              target="_blank"
-            >
-              isciii
-            </a>{" "}
-            {fecha}
-          </Legend>
-          <PrediccionCard
-            prediccion={calculatePrediction(fecha, casos, casos24h)}
-          />
-          <PaceChartCard paceData={paceData} />
-        </Wrapper>
-      )}
-    </Layout>
+    <Suspense fallback={<Spinner />}>
+      <Layout>
+        <SEO title="Home" />
+        {loading ? (
+          <Spinner />
+        ) : (
+          <Wrapper>
+            <DataCard
+              projectedCasos={projectedCasos}
+              recuperados={recuperados}
+              incrementRecuperados={incrementRecuperados}
+              defunciones={defunciones}
+              incrementDefunciones={incrementDefunciones}
+              state="España"
+              casos={casos}
+              incrementCasos={incrementCasos}
+              fecha={fecha}
+              pace={getPace()}
+            />
+            <Legend>
+              *Última actualización del{" "}
+              <a
+                className="isciilink"
+                href="https://covid19.isciii.es"
+                target="_blank"
+              >
+                isciii
+              </a>{" "}
+              {fecha}
+            </Legend>
+            <PrediccionCard
+              prediccion={calculatePrediction(fecha, casos, casos24h)}
+            />
+            <PaceChartCard paceData={paceData} />
+          </Wrapper>
+        )}
+      </Layout>
+    </Suspense>
   )
 }
 
