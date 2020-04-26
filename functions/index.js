@@ -4,6 +4,14 @@ const serviceAccount = require("./admin.json")
 const moment = require("moment")
 const axios = require("axios")
 const cors = require("cors")({ origin: true })
+const {
+  rawCasos,
+  rawHospitalizados,
+  rawUCI,
+  rawFallecidos,
+  rawRecuperados,
+  rawFechas,
+} = require("./rawData")
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -45,6 +53,32 @@ exports.getInfectedData = functions
               }
             })
           }
+          response.status(200).send(data)
+          return
+        })
+        .catch(error => {
+          console.log(error)
+          response.status(500).send(error)
+          return
+        })
+    })
+  })
+
+exports.getHistorical = functions
+  .region("europe-west2")
+  .https.onRequest((request, response) => {
+    cors(request, response, () => {
+      if (request.method !== "GET") {
+        return response.status(500).json({
+          message: "Not allowed",
+        })
+      }
+      admin
+        .firestore()
+        .doc("stats/historical")
+        .get()
+        .then(snapshot => {
+          const data = snapshot.data()
           response.status(200).send(data)
           return
         })
@@ -134,6 +168,11 @@ const parseDate = (rawDate, rawHour) => {
 }
 
 const calculatePace = casos24h => (casos24h / (24 * 60)).toFixed(2)
+const calculatePaceHour = casos24h => (casos24h / 24).toFixed(2)
+const calculateIncrement = (casesToday, casesYesterday) =>
+  casesToday - casesYesterday
+const calculateActive = (casos, recuperados, fallecidos) =>
+  casos - recuperados - fallecidos
 
 const manageDB = async (
   parsedDate,
@@ -155,6 +194,17 @@ const manageDB = async (
       return null
     })
 
+  const serie = await db
+    .doc("stats/historical")
+    .get()
+    .then(snapshot => {
+      const { serie } = snapshot.data()
+      return serie ? serie : []
+    })
+    .catch(error => {
+      return null
+    })
+
   const updatedObject = {
     lastUpdate: moment(),
     fecha: parsedDate,
@@ -163,7 +213,7 @@ const manageDB = async (
     recuperados: Number(recuperados),
     hospitalizados: Number(hospitalizados),
     casos24h: Number(casos24h),
-    casosActivos: Number(casos) - Number(recuperados) - Number(fallecidos)
+    casosActivos: Number(calculateActive(casos, recuperados, fallecidos)),
   }
 
   const lastPace = pace[pace.length - 1]
@@ -187,6 +237,29 @@ const manageDB = async (
       res.status(200).send(snapshot)
     })
     .catch(error => {
+      res.status(500).send(error)
+    })
+
+  let updatedSerie = [
+    ...serie,
+    {
+      casos: updatedObject.casos,
+      casos24h: updatedObject.casos24h,
+      casosActivos: updatedObject.casosActivos,
+      fallecidos: updatedObject.fallecidos,
+      fecha: updatedObject.fecha,
+      hospitalizados: updatedObject.hospitalizados,
+      recuperados: updatedObject.recuperados,
+    },
+  ]
+  db.doc("stats/historical")
+    .set({ serie: updatedSerie }, { merge: true })
+    .then(historicalSnapshot => {
+      console.log("[historicalSnapshot]", historicalSnapshot)
+      res.status(200).send(historicalSnapshot)
+    })
+    .catch(error => {
+      console.log("[historicalSnapshot - error]", error)
       res.status(500).send(error)
     })
 }
@@ -274,5 +347,92 @@ exports.jeffriTest = functions
         casos24h,
         res
       )
+    })
+  })
+
+exports.jeffriUploader = functions
+  .region("europe-west2")
+  .https.onRequest((req, res) => {
+    if (req.method !== "GET") {
+      return res.status(403).send("Forbidden!")
+    }
+
+    return cors(req, res, () => {
+      let payload = []
+
+      for (let index = 0; index < rawCasos.length; index++) {
+        const casos24h = calculateIncrement(
+          rawCasos[index],
+          index > 0 ? rawCasos[index - 1] : 0
+        )
+        const hospitalizados24h = calculateIncrement(
+          rawHospitalizados[index],
+          index > 0 ? rawHospitalizados[index - 1] : 0
+        )
+        const uci24h = calculateIncrement(
+          rawUCI[index],
+          index > 0 ? rawUCI[index - 1] : 0
+        )
+        const fallecidos24h = calculateIncrement(
+          rawFallecidos[index],
+          index > 0 ? rawFallecidos[index - 1] : 0
+        )
+        const recuperados24h = calculateIncrement(
+          rawRecuperados[index],
+          index > 0 ? rawRecuperados[index - 1] : 0
+        )
+        const activos = calculateActive(
+          rawCasos[index],
+          rawRecuperados[index],
+          rawFallecidos[index]
+        )
+        const activos24h = calculateIncrement(
+          activos,
+          index > 0 ? payload[index - 1].activos.value : 0
+        )
+
+        payload.push({
+          fecha: rawFechas[index],
+          casos: {
+            value: rawCasos[index],
+            increment: casos24h,
+            pace: calculatePace(casos24h),
+            paceHour: calculatePaceHour(casos24h),
+          },
+          hospitalizados: {
+            value: rawHospitalizados[index],
+            increment: hospitalizados24h,
+            pace: calculatePace(hospitalizados24h),
+            paceHour: calculatePaceHour(hospitalizados24h),
+          },
+          uci: {
+            value: rawUCI[index],
+            increment: uci24h,
+            pace: calculatePace(uci24h),
+            paceHour: calculatePaceHour(uci24h),
+          },
+          fallecidos: {
+            value: rawFallecidos[index],
+            increment: fallecidos24h,
+            pace: calculatePace(fallecidos24h),
+            paceHour: calculatePaceHour(fallecidos24h),
+          },
+          recuperados: {
+            value: rawRecuperados[index],
+            increment: recuperados24h,
+            pace: calculatePace(recuperados24h),
+            paceHour: calculatePaceHour(recuperados24h),
+          },
+          activos: {
+            value: activos,
+            increment: activos24h,
+            pace: calculatePace(activos24h),
+            paceHour: calculatePaceHour(activos24h),
+          },
+        })
+      }
+
+      console.log("[payload]", payload)
+      res.status(200).send(payload)
     })
   })
