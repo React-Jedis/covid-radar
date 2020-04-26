@@ -90,8 +90,6 @@ const IndexPage = () => {
             data.serie.length - (data.serie.length > 1 ? 2 : 1)
           ]
 
-          console.log("[serie]", casos, casos24h, fallecidos, recuperados)
-
           setIncrementCasos24h(currentCasos24h - casos24h)
           setIncrementCasos(currentCasos - casos)
           setIncrementRecuperados(currentRecuperados - recuperados)

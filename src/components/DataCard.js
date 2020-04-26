@@ -128,9 +128,8 @@ const DataCard = ({
           <span className="description casos-desc">casos / min.</span>
         </div>
         <div className="casos">
-          <span className="data">
-            {casos.toLocaleString()}* ({getIncrement(incrementCasos)})
-          </span>
+          <span className="data">{casos.toLocaleString()}*</span>
+          <span>({getIncrement(incrementCasos)})</span>
           <span className="description">casos</span>
         </div>
         <div className="projected">
@@ -140,15 +139,13 @@ const DataCard = ({
           <span className="description">Estimación de casos hora actual</span>
         </div>
         <div className="recuperados">
-          <span className="data">
-            {recuperados.toLocaleString()} ({getIncrement(incrementRecuperados)})
-          </span>
+          <span className="data">{recuperados.toLocaleString()}</span>
+          <span>({getIncrement(incrementRecuperados)})</span>
           <span className="description">recuperados</span>
         </div>
         <div className="defunciones">
-          <span className="data">
-            {defunciones.toLocaleString()} ({getIncrement(incrementDefunciones)})
-          </span>
+          <span className="data">{defunciones.toLocaleString()}</span>
+          <span>({getIncrement(incrementDefunciones)})</span>
           <span className="description">defunciones</span>
         </div>
       </InfoData>
