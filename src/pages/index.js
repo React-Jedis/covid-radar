@@ -1,15 +1,14 @@
-import React, { useState, useEffect, Suspense } from "react"
+import React, { useState, useEffect } from "react"
 import moment from "moment"
 import axios from "axios"
 import styled from "styled-components"
 
+import Layout from "../components/layout"
 import SEO from "../components/seo"
 import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
 import PaceChartCard from "../components/PaceChartCard"
 import PrediccionCard from "../components/PrediccionCard"
-
-const Layout = React.lazy(() => import("../components/layout"))
 
 const Legend = styled.span`
   padding: 3px;
@@ -164,44 +163,42 @@ const IndexPage = () => {
   }, [casos, projectedCasos, firstMount])
 
   return (
-    <Suspense fallback={<Spinner />}>
-      <Layout>
-        <SEO title="Home" />
-        {loading ? (
-          <Spinner />
-        ) : (
-          <Wrapper>
-            <DataCard
-              projectedCasos={projectedCasos}
-              recuperados={recuperados}
-              incrementRecuperados={incrementRecuperados}
-              defunciones={defunciones}
-              incrementDefunciones={incrementDefunciones}
-              state="España"
-              casos={casos}
-              incrementCasos={incrementCasos}
-              fecha={fecha}
-              pace={getPace()}
-            />
-            <Legend>
-              *Última actualización del{" "}
-              <a
-                className="isciilink"
-                href="https://covid19.isciii.es"
-                target="_blank"
-              >
-                isciii
-              </a>{" "}
-              {fecha}
-            </Legend>
-            <PrediccionCard
-              prediccion={calculatePrediction(fecha, casos, casos24h)}
-            />
-            <PaceChartCard paceData={paceData} />
-          </Wrapper>
-        )}
-      </Layout>
-    </Suspense>
+    <Layout>
+      <SEO title="Home" />
+      {loading ? (
+        <Spinner />
+      ) : (
+        <Wrapper>
+          <DataCard
+            projectedCasos={projectedCasos}
+            recuperados={recuperados}
+            incrementRecuperados={incrementRecuperados}
+            defunciones={defunciones}
+            incrementDefunciones={incrementDefunciones}
+            state="España"
+            casos={casos}
+            incrementCasos={incrementCasos}
+            fecha={fecha}
+            pace={getPace()}
+          />
+          <Legend>
+            *Última actualización del{" "}
+            <a
+              className="isciilink"
+              href="https://covid19.isciii.es"
+              target="_blank"
+            >
+              isciii
+            </a>{" "}
+            {fecha}
+          </Legend>
+          <PrediccionCard
+            prediccion={calculatePrediction(fecha, casos, casos24h)}
+          />
+          <PaceChartCard paceData={paceData} />
+        </Wrapper>
+      )}
+    </Layout>
   )
 }
 
