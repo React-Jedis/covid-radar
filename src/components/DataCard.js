@@ -95,48 +95,65 @@ const InfoData = styled.div`
 
 const DataCard = ({
   casos,
+  incrementCasos,
   projectedCasos,
   recuperados,
+  incrementRecuperados,
   defunciones,
+  incrementDefunciones,
   state,
   fecha,
   hora,
   pace,
-}) => (
-  <Card>
-    <InfoData>
-      <div className="title">
-        <span>{state}</span>
-      </div>
-      <div className="date">
-        <span>{moment().format("DD/MM/YYYY")}</span>
-      </div>
-      <div className="pace">
-        <span className="data">
-          {pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-        </span>
-        <span className="description casos-desc">casos / min.</span>
-      </div>
-      <div className="casos">
-        <span className="data">{casos.toLocaleString()}*</span>
-        <span className="description">casos</span>
-      </div>
-      <div className="projected">
-        <span className="data" style={{ fontSize: "35px" }}>
-          {parseInt(projectedCasos).toLocaleString()}
-        </span>
-        <span className="description">Estimación de casos hora actual</span>
-      </div>
-      <div className="recuperados">
-        <span className="data">{recuperados.toLocaleString()}</span>
-        <span className="description">recuperados</span>
-      </div>
-      <div className="defunciones">
-        <span className="data">{defunciones.toLocaleString()}</span>
-        <span className="description">defunciones</span>
-      </div>
-    </InfoData>
-  </Card>
-)
+}) => {
+  const getIncrement = value => {
+    if (value === 0 || value > 0) return `+${value}`
+
+    return value
+  }
+
+  return (
+    <Card>
+      <InfoData>
+        <div className="title">
+          <span>{state}</span>
+        </div>
+        <div className="date">
+          <span>{moment().format("DD/MM/YYYY")}</span>
+        </div>
+        <div className="pace">
+          <span className="data">
+            {pace.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          </span>
+          <span className="description casos-desc">casos / min.</span>
+        </div>
+        <div className="casos">
+          <span className="data">
+            {casos.toLocaleString()}* ({getIncrement(incrementCasos)})
+          </span>
+          <span className="description">casos</span>
+        </div>
+        <div className="projected">
+          <span className="data" style={{ fontSize: "35px" }}>
+            {parseInt(projectedCasos).toLocaleString()}
+          </span>
+          <span className="description">Estimación de casos hora actual</span>
+        </div>
+        <div className="recuperados">
+          <span className="data">
+            {recuperados.toLocaleString()} ({getIncrement(incrementRecuperados)})
+          </span>
+          <span className="description">recuperados</span>
+        </div>
+        <div className="defunciones">
+          <span className="data">
+            {defunciones.toLocaleString()} ({getIncrement(incrementDefunciones)})
+          </span>
+          <span className="description">defunciones</span>
+        </div>
+      </InfoData>
+    </Card>
+  )
+}
 
 export default DataCard
