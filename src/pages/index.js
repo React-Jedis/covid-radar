@@ -9,6 +9,7 @@ import DataCard from "../components/DataCard"
 import Spinner from "../components/Spinner"
 import PaceChartCard from "../components/PaceChartCard"
 import PrediccionCard from "../components/PrediccionCard"
+import GeneralChartCard from "../components/GeneralChartCard"
 
 const Legend = styled.span`
   padding: 3px;
@@ -36,7 +37,6 @@ const Wrapper = styled.div`
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
   const [casos24h, setCasos24h] = useState(0)
-  const [incrementCasos24h, setIncrementCasos24h] = useState(0)
   const [casos, setCasos] = useState(0)
   const [incrementCasos, setIncrementCasos] = useState(0)
   const [paceData, setPaceData] = useState([])
@@ -86,14 +86,13 @@ const IndexPage = () => {
       .then(response => response.data)
       .then(async data => {
         if (data && data.serie) {
-          const { casos, casos24h, fallecidos, recuperados } = data.serie[
-            data.serie.length - (data.serie.length > 1 ? 2 : 1)
+          const { casos, fallecidos, recuperados } = data.serie[
+            data.serie.length > 0 ? data.serie.length - 1 : 0
           ]
 
-          setIncrementCasos24h(currentCasos24h - casos24h)
-          setIncrementCasos(currentCasos - casos)
-          setIncrementRecuperados(currentRecuperados - recuperados)
-          setIncrementDefunciones(currentFallecidos - fallecidos)
+          setIncrementCasos(casos.increment)
+          setIncrementRecuperados(recuperados.increment)
+          setIncrementDefunciones(fallecidos.increment)
         }
       })
       .catch(error => console.log(error))
@@ -194,6 +193,7 @@ const IndexPage = () => {
             prediccion={calculatePrediction(fecha, casos, casos24h)}
           />
           <PaceChartCard paceData={paceData} />
+          <GeneralChartCard />
         </Wrapper>
       )}
     </Layout>

@@ -240,16 +240,42 @@ const manageDB = async (
       res.status(500).send(error)
     })
 
-  let updatedSerie = [
+  // Update historical data
+  const incrementCasos = calculateIncrement(
+    updatedObject.casos,
+    serie[serie.length > 0 ? serie.length - 1 : 0].casos.value
+  )
+  const incrementFallecidos = calculateIncrement(
+    updatedObject.fallecidos,
+    serie[serie.length > 0 ? serie.length - 1 : 0].fallecidos.value
+  )
+  const incrementRecuperados24h = calculateIncrement(
+    updatedObject.recuperados,
+    serie[serie.length > 0 ? serie.length - 1 : 0].recuperados.value
+  )
+
+  const updatedSerie = [
     ...serie,
     {
-      casos: updatedObject.casos,
-      casos24h: updatedObject.casos24h,
-      casosActivos: updatedObject.casosActivos,
-      fallecidos: updatedObject.fallecidos,
       fecha: updatedObject.fecha,
-      hospitalizados: updatedObject.hospitalizados,
-      recuperados: updatedObject.recuperados,
+      casos: {
+        value: updatedObject.casos,
+        increment: incrementCasos,
+        pace: calculatePace(incrementCasos),
+        paceHour: calculatePaceHour(incrementCasos),
+      },
+      fallecidos: {
+        value: updatedObject.fallecidos,
+        increment: incrementFallecidos,
+        pace: calculatePace(incrementFallecidos),
+        paceHour: calculatePaceHour(incrementFallecidos),
+      },
+      recuperados: {
+        value: updatedObject.recuperados,
+        increment: incrementRecuperados24h,
+        pace: calculatePace(incrementRecuperados24h),
+        paceHour: calculatePaceHour(incrementRecuperados24h),
+      },
     },
   ]
   db.doc("stats/historical")
@@ -365,14 +391,6 @@ exports.jeffriUploader = functions
           rawCasos[index],
           index > 0 ? rawCasos[index - 1] : 0
         )
-        const hospitalizados24h = calculateIncrement(
-          rawHospitalizados[index],
-          index > 0 ? rawHospitalizados[index - 1] : 0
-        )
-        const uci24h = calculateIncrement(
-          rawUCI[index],
-          index > 0 ? rawUCI[index - 1] : 0
-        )
         const fallecidos24h = calculateIncrement(
           rawFallecidos[index],
           index > 0 ? rawFallecidos[index - 1] : 0
@@ -380,15 +398,6 @@ exports.jeffriUploader = functions
         const recuperados24h = calculateIncrement(
           rawRecuperados[index],
           index > 0 ? rawRecuperados[index - 1] : 0
-        )
-        const activos = calculateActive(
-          rawCasos[index],
-          rawRecuperados[index],
-          rawFallecidos[index]
-        )
-        const activos24h = calculateIncrement(
-          activos,
-          index > 0 ? payload[index - 1].activos.value : 0
         )
 
         payload.push({
@@ -398,18 +407,6 @@ exports.jeffriUploader = functions
             increment: casos24h,
             pace: calculatePace(casos24h),
             paceHour: calculatePaceHour(casos24h),
-          },
-          hospitalizados: {
-            value: rawHospitalizados[index],
-            increment: hospitalizados24h,
-            pace: calculatePace(hospitalizados24h),
-            paceHour: calculatePaceHour(hospitalizados24h),
-          },
-          uci: {
-            value: rawUCI[index],
-            increment: uci24h,
-            pace: calculatePace(uci24h),
-            paceHour: calculatePaceHour(uci24h),
           },
           fallecidos: {
             value: rawFallecidos[index],
@@ -423,16 +420,16 @@ exports.jeffriUploader = functions
             pace: calculatePace(recuperados24h),
             paceHour: calculatePaceHour(recuperados24h),
           },
-          activos: {
-            value: activos,
-            increment: activos24h,
-            pace: calculatePace(activos24h),
-            paceHour: calculatePaceHour(activos24h),
-          },
         })
       }
 
-      console.log("[payload]", payload)
-      res.status(200).send(payload)
+      db.doc("stats/historical")
+        .set({ serie: payload })
+        .then(snapshot => {
+          res.status(200).send(snapshot)
+        })
+        .catch(error => {
+          res.status(500).send(error)
+        })
     })
   })
