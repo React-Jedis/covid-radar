@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
-import Spinner from "@bit/dastag.ui-components.spinner"
 
 import Card from "../Card/Card"
 import GeneralChart from "./GeneralChart"
@@ -53,7 +52,7 @@ const GeneralChartCard = () => {
       <GeneralChart dataObj={realData} />
     </Card>
   ) : (
-    <Spinner foreground="#40c6a2" background="#191c22" />
+    <div />
   )
 }
 
