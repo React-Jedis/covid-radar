@@ -37,9 +37,10 @@ const Wrapper = styled.div`
 const IndexPage = () => {
   const [fecha, setFecha] = useState("")
   const [casos24h, setCasos24h] = useState(0)
+  const [casosActivos, setCasosActivos] = useState(0)
+  const [incrementCasosActivos, setIncrementCasosActivos] = useState(0)
   const [casos, setCasos] = useState(0)
   const [incrementCasos, setIncrementCasos] = useState(0)
-  const [paceData, setPaceData] = useState([])
   const [recuperados, setRecuperados] = useState(0)
   const [incrementRecuperados, setIncrementRecuperados] = useState(0)
   const [defunciones, setDefunciones] = useState(0)
@@ -47,117 +48,51 @@ const IndexPage = () => {
   const [projectedCasos, setProjectedCasos] = useState(casos)
   const [firstMount, setFirstMount] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [APIData, setAPIData] = useState([])
+  const [pace, setPace] = useState(0)
   moment.locale("es")
 
-  const getInfectedData = () =>
+  const formatDataFromAPI = rawData => {
+    const last = rawData.length - 1
+    const yesterday = rawData.length - 2
+    const casos24h = rawData[last].Confirmed - rawData[yesterday].Confirmed
+    setCasos24h(casos24h)
+    setFecha(rawData[last].Date)
+    setCasos(rawData[last].Confirmed)
+    setRecuperados(rawData[last].Recovered)
+    setDefunciones(rawData[last].Deaths)
+    setCasosActivos(rawData[last].Active)
+    setIncrementCasos(casos24h)
+    setIncrementRecuperados(
+      rawData[last].Recovered - rawData[yesterday].Recovered
+    )
+    setIncrementDefunciones(rawData[last].Deaths - rawData[yesterday].Deaths)
+    setIncrementCasosActivos(rawData[last].Active - rawData[yesterday].Active)
+
+    setPace((casos24h / (24 * 60)).toFixed(2))
+  }
+
+  const getInfectedDataAPI = () => {
     axios
       .get(
-        "https://europe-west2-covid-radar.cloudfunctions.net/getInfectedData?action=stats&country=spain"
+        `https://api.covid19api.com/country/spain?from=2020-02-24T00:00:00Z&to=${moment(
+          new Date()
+        )
+          .add(-1, "days")
+          .toISOString()}`
       )
       .then(response => response.data)
       .then(async data => {
-        if (data) {
-          setCasos24h(data.casos24h)
-          setFecha(data.fecha)
-          setCasos(data.casos)
-          setRecuperados(data.recuperados)
-          setDefunciones(data.fallecidos)
-          setPaceData(data.pace)
-
-          getHistoricalData(
-            data.casos24h,
-            data.casos,
-            data.recuperados,
-            data.fallecidos
-          )
-          setLoading(false)
-        }
-      })
-      .catch(response => console.error("Response error", response))
-
-  const getHistoricalData = (
-    currentCasos24h,
-    currentCasos,
-    currentRecuperados,
-    currentFallecidos
-  ) => {
-    axios
-      .get("https://europe-west2-covid-radar.cloudfunctions.net/getHistorical")
-      .then(response => response.data)
-      .then(async data => {
-        if (data && data.serie) {
-          const { casos, fallecidos, recuperados } = data.serie[
-            data.serie.length > 0 ? data.serie.length - 1 : 0
-          ]
-
-          setIncrementCasos(casos.increment)
-          setIncrementRecuperados(recuperados.increment)
-          setIncrementDefunciones(fallecidos.increment)
-        }
+        formatDataFromAPI(data)
+        setAPIData(data)
+        setLoading(false)
       })
       .catch(error => console.log(error))
   }
 
   useEffect(() => {
-    getInfectedData()
-    const interval = setInterval(getInfectedData, 1000 * 60 * 30)
-    return () => clearInterval(interval)
+    getInfectedDataAPI()
   }, [])
-
-  const calculateProjectedCasos = (
-    theDate,
-    currentDate,
-    theCasos,
-    theCasos24h
-  ) => {
-    const offset = theDate.isValid()
-      ? moment.duration(currentDate.diff(theDate))
-      : moment.duration(1000)
-
-    const projectedCasos =
-      theCasos + (theCasos24h / (24 * 60 * 60)) * offset.asSeconds()
-    return projectedCasos
-  }
-
-  const calculatePrediction = (fecha, casos, casos24h) => {
-    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
-    const calculate = moment(theDate.toDate()).add(1, "d")
-    const projectedCasos = calculateProjectedCasos(
-      theDate,
-      calculate,
-      casos,
-      casos24h
-    )
-    return projectedCasos
-  }
-
-  const updateStateWithPojectedCasos = () => {
-    const theDate = moment(fecha, "DD-MM-YYYY HH:mm:ss")
-    const projectedCasos = calculateProjectedCasos(
-      theDate,
-      moment(),
-      casos,
-      casos24h
-    )
-    setProjectedCasos(projectedCasos)
-  }
-
-  const getPace = () => paceData[paceData.length - 1].value
-
-  useEffect(() => {
-    let theTimeout
-    if (casos !== 0) {
-      if (firstMount) {
-        updateStateWithPojectedCasos()
-        setFirstMount(false)
-      } else {
-        theTimeout = setTimeout(updateStateWithPojectedCasos, 5000)
-      }
-    }
-    return () => {
-      clearTimeout(theTimeout)
-    }
-  }, [casos, projectedCasos, firstMount])
 
   return (
     <Layout>
@@ -167,7 +102,8 @@ const IndexPage = () => {
       ) : (
         <Wrapper>
           <DataCard
-            projectedCasos={projectedCasos}
+            activeCasos={casosActivos}
+            incrementActiveCasos={incrementCasosActivos}
             recuperados={recuperados}
             incrementRecuperados={incrementRecuperados}
             defunciones={defunciones}
@@ -176,7 +112,7 @@ const IndexPage = () => {
             casos={casos}
             incrementCasos={incrementCasos}
             fecha={fecha}
-            pace={getPace()}
+            pace={pace}
           />
           <Legend>
             *Última actualización del{" "}
@@ -187,12 +123,8 @@ const IndexPage = () => {
             >
               isciii
             </a>{" "}
-            {fecha}
+            {moment(fecha).format("DD/MM/YYYY")}
           </Legend>
-          <PrediccionCard
-            prediccion={calculatePrediction(fecha, casos, casos24h)}
-          />
-          <PaceChartCard paceData={paceData} />
           <GeneralChartCard />
         </Wrapper>
       )}

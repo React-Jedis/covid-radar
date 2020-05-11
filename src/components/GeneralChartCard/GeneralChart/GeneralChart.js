@@ -16,11 +16,15 @@ const GeneralChart = ({ dataObj }) => {
         label: "Fallecidos",
         data: dataObj.fallecidos,
       },
+      {
+        label: "Activos",
+        data: dataObj.activos,
+      },
     ],
     []
   )
 
-  const colors = ["#ff8800", "#40c6a2", "#111111"]
+  const colors = ["#ff8800", "#40c6a2", "#111111", "#c1345f"]
   const getSeriesStyle = React.useCallback(
     series => ({
       color: colors[series.index],
