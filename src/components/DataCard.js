@@ -40,6 +40,7 @@ const InfoData = styled.div`
       border-radius: 50%;
       min-width: 85px;
       max-width: 85px;
+      max-height: 85px;
       margin: 10px;
       background-color:  ${props => props.theme.palette.baseColors.projected};
       color: white;
@@ -95,6 +96,8 @@ const InfoData = styled.div`
 
 const DataCard = ({
   casos,
+  activeCasos,
+  incrementActiveCasos,
   incrementCasos,
   projectedCasos,
   recuperados,
@@ -134,9 +137,10 @@ const DataCard = ({
         </div>
         <div className="projected">
           <span className="data" style={{ fontSize: "35px" }}>
-            {parseInt(projectedCasos).toLocaleString()}
+            {parseInt(activeCasos).toLocaleString()}
           </span>
-          <span className="description">Estimación de casos hora actual</span>
+          <span>({getIncrement(incrementActiveCasos)})</span>
+          <span className="description">Casos activos</span>
         </div>
         <div className="recuperados">
           <span className="data">{recuperados.toLocaleString()}</span>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
+import moment from "moment"
 
 import Card from "../Card/Card"
 import GeneralChart from "./GeneralChart"
@@ -10,7 +11,7 @@ const Title = styled.div`
   color: ${props => props.theme.palette.baseColors.cardTitle};
 `
 const formatToChartData = (fecha, value) => {
-  return { x: new Date(fecha._seconds * 1000), y: value }
+  return { x: new Date(fecha), y: value }
 }
 
 const GeneralChartCard = () => {
@@ -20,26 +21,49 @@ const GeneralChartCard = () => {
     const casos = []
     const recuperados = []
     const fallecidos = []
+    const activos = []
 
-    rawData.forEach(data => {
-      casos.push(formatToChartData(data.fecha, data.casos.increment))
-      recuperados.push(
-        formatToChartData(data.fecha, data.recuperados.increment)
-      )
-      fallecidos.push(formatToChartData(data.fecha, data.fallecidos.increment))
+    rawData.forEach((data, index) => {
+      let casosIncrement =
+        data.Confirmed - rawData[index > 0 ? index - 1 : 0].Confirmed
+      const recuperadosIncrement =
+        data.Recovered - rawData[index > 0 ? index - 1 : 0].Recovered
+      const fallecidosIncrement =
+        data.Deaths - rawData[index > 0 ? index - 1 : 0].Deaths
+      let activosIncrement =
+        data.Active - rawData[index > 0 ? index - 1 : 0].Active
+
+      if (data.Date === "2020-04-24T00:00:00Z") {
+        casosIncrement = "0"
+        activosIncrement = "0"
+      }
+
+      casos.push(formatToChartData(data.Date, casosIncrement))
+      recuperados.push(formatToChartData(data.Date, recuperadosIncrement))
+      fallecidos.push(formatToChartData(data.Date, fallecidosIncrement))
+      activos.push(formatToChartData(data.Date, activosIncrement))
     })
 
-    setRealData({ casos, recuperados, fallecidos })
+    setRealData({ casos, recuperados, fallecidos, activos })
   }
 
   useEffect(() => {
     axios
       .get(
-        "https://europe-west2-covid-radar.cloudfunctions.net/getInfectedData?action=stats&country=historical"
+        `https://api.covid19api.com/country/spain?from=2020-02-24T00:00:00Z&to=${moment(
+          new Date()
+        )
+          .add(-1, "days")
+          .toISOString()}`
       )
       .then(response => response.data)
       .then(async data => {
-        formatRawData(data.serie)
+        console.log(
+          moment(new Date())
+            .add(-1, "days")
+            .toISOString()
+        )
+        formatRawData(data)
       })
       .catch(error => console.log(error))
   }, [])

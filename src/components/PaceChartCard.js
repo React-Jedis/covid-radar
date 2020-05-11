@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import moment from "moment"
 import Card from "./Card/Card"
 import PaceChart from "./PaceChart/PaceChart"
@@ -14,13 +14,27 @@ const formatToChartPaceData = theData =>
     return { x: moment(pace.fecha, "DD-MM-YYYY HH:mm:ss"), y: pace.value }
   })
 
-const PaceChartCard = ({ paceData }) => (
-  <Card>
-    <Title>
-      <h3>Evolución casos por minuto</h3>
-    </Title>
-    <PaceChart paceData={formatToChartPaceData(paceData)} />
-  </Card>
-)
+const PaceChartCard = ({ data }) => {
+  const [paceData, setPaceData] = useState([])
+
+  useEffect(() => {
+    setPaceData(
+      data.map(day => {
+        return {
+          x: new Date(day.date),
+          y: day.value,
+        }
+      })
+    )
+  }, [])
+  return (
+    <Card>
+      <Title>
+        <h3>Evolución casos por minuto</h3>
+      </Title>
+      <PaceChart paceData={paceData} />
+    </Card>
+  )
+}
 
 export default PaceChartCard
