@@ -15,6 +15,7 @@ export default function HTML(props) {
           src="https://kit.fontawesome.com/8da2934028.js"
           crossorigin="anonymous"
         ></script>
+        <script async defer data-website-id="92c17968-7293-41da-b8d8-ae29f7f4200f" src="https://hal-umami-analytics.vercel.app/umami.js"></script>
         {props.headComponents}
       </head>
       <body {...props.bodyAttributes}>
